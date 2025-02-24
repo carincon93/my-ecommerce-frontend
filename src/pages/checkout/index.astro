@@ -1,0 +1,28 @@
+---
+import CheckoutLayout from '@/layouts/CheckoutLayout.astro'
+import CheckoutForm from './_checkout-form'
+
+import { fetchEcommerceData } from '@/services/ecommerceService'
+import { URL_BACKEND_UPLOADS } from 'astro:env/client'
+const result = await fetchEcommerceData()
+---
+
+<CheckoutLayout title={`Checkout`}>
+    <main class="flex flex-col items-center justify-center overflow-y-scroll">
+        <section class="max-xl:w-11/12 min-2xl:w-6/12 max-2xl:w-8/12 mx-auto">
+            <div class="flex items-center max-lg:justify-center my-10">
+                <a
+                    href="/"
+                    class="inline-block">
+                    <img
+                        src={`${URL_BACKEND_UPLOADS}/ecommerce/${result.data?.logoDark}`}
+                        class=""
+                        width="150"
+                    />
+                </a>
+            </div>
+
+            <CheckoutForm client:load />
+        </section>
+    </main>
+</CheckoutLayout>

@@ -1,0 +1,10 @@
+---
+import BackofficeLayout from '@/layouts/BackofficeLayout.astro'
+import ProductsTable from './_products-table'
+---
+
+<BackofficeLayout title="Productos">
+    <div class="min-lg:flex flex-col items-center justify-center h-full max-lg:pt-20">
+        <ProductsTable client:load />
+    </div>
+</BackofficeLayout>

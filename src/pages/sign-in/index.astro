@@ -1,0 +1,12 @@
+---
+import BackofficeLayout from '@/layouts/BackofficeLayout.astro'
+import { SignIn } from '@clerk/astro/components'
+
+export const prerender = true
+---
+
+<BackofficeLayout title="Sign In">
+    <div class="flex items-center justify-center h-full">
+        <SignIn />
+    </div>
+</BackofficeLayout>

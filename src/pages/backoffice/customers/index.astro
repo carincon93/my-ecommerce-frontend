@@ -1,0 +1,10 @@
+---
+import BackofficeLayout from '@/layouts/BackofficeLayout.astro'
+import CustomersTable from './_customers-table'
+---
+
+<BackofficeLayout title="Clientes">
+    <div class="min-lg:flex flex-col items-center justify-center h-full max-lg:pt-20">
+        <CustomersTable client:load />
+    </div>
+</BackofficeLayout>

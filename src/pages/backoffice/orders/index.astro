@@ -1,0 +1,10 @@
+---
+import BackofficeLayout from '@/layouts/BackofficeLayout.astro'
+import CategoriesTable from './_orders-table'
+---
+
+<BackofficeLayout title="Pedidos">
+    <div class="min-lg:flex flex-col items-center justify-center h-full max-lg:pt-20">
+        <CategoriesTable client:load />
+    </div>
+</BackofficeLayout>

@@ -1,0 +1,37 @@
+---
+import Layout from '@/layouts/Layout.astro'
+
+import ProductCarousel from '@/components/ProductCarousel'
+// import WelcomeInfo from '@/components/WelcomeInfo'
+
+import Parallax from './_parallax'
+
+// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
+// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+
+<Layout title="Inicio">
+    <main class="-translate-y-[90px] relative">
+        <Parallax client:load />
+
+        <section class="p-10 space-y-10 overflow-x-hidden">
+            <h1 class="text-center font-bold uppercase text-4xl mb-10">Nuevo</h1>
+            <ProductCarousel
+                category="nuevo"
+                client:load
+            />
+        </section>
+
+        <section class="p-10 space-y-10 overflow-x-hidden">
+            <h1 class="text-center font-bold uppercase text-4xl mb-10">Colección destacada</h1>
+            <ProductCarousel
+                category="destacado"
+                client:load
+            />
+        </section>
+
+        <section class="mt-10 hidden">
+            <!-- <WelcomeInfo client:load /> -->
+        </section>
+    </main>
+</Layout>

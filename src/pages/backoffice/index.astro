@@ -1,0 +1,64 @@
+---
+import BackofficeLayout from '@/layouts/BackofficeLayout.astro'
+import AuthProfile from './_auth-profile'
+---
+
+<BackofficeLayout title="Backoffice">
+    <div class="w-8/12 flex flex-col items-center justify-center mx-auto h-full">
+        <AuthProfile client:load />
+
+        <ul class="md:grid grid-cols-2 gap-4 max-md:space-y-4 mt-10 w-full">
+            <li>
+                <a
+                    href="/backoffice/my-ecommerce"
+                    class="bg-white/80 text-black backdrop-blur-sm p-10 rounded-lg w-full block hover:opacity-60 transition-opacity text-center"
+                    transition:name="ecommerce-box">
+                    <span transition:name="ecommerce-text">Mi E-Commerce</span>
+                </a>
+            </li>
+
+            <li>
+                <a
+                    href="/backoffice/policies"
+                    class="bg-white/80 text-black backdrop-blur-sm p-10 rounded-lg w-full block hover:opacity-60 transition-opacity text-center"
+                    transition:name="policies-box">
+                    <span transition:name="policies-text">Políticas</span>
+                </a>
+            </li>
+            <li>
+                <a
+                    href="/backoffice/products"
+                    class="bg-white/80 text-black backdrop-blur-sm p-10 rounded-lg w-full block hover:opacity-60 transition-opacity text-center"
+                    transition:name="products-box">
+                    <span transition:name="products-text">Productos</span>
+                </a>
+            </li>
+
+            <li>
+                <a
+                    href="/backoffice/categories"
+                    class="bg-white/80 text-black backdrop-blur-sm p-10 rounded-lg w-full block hover:opacity-60 transition-opacity text-center"
+                    transition:name="categories-box">
+                    <span transition:name="categories-text">Categorías</span>
+                </a>
+            </li>
+
+            <li>
+                <a
+                    href="/backoffice/orders"
+                    class="bg-white/80 text-black backdrop-blur-sm p-10 rounded-lg w-full block hover:opacity-60 transition-opacity text-center"
+                    transition:name="orders-box">
+                    <span transition:name="orders-text">Pedidos</span>
+                </a>
+            </li>
+            <li>
+                <a
+                    href="/backoffice/customers"
+                    class="bg-white/80 text-black backdrop-blur-sm p-10 rounded-lg w-full block hover:opacity-60 transition-opacity text-center"
+                    transition:name="customers-box">
+                    <span transition:name="customers-text">Clientes</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</BackofficeLayout>

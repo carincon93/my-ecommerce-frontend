@@ -1,0 +1,161 @@
+---
+import CustomNavigationMenu from '@/components/CustomNavigationMenu'
+import Footer from '@/components/Footer'
+import whatsapp from '@/assets/icons/whatsapp.svg'
+import backgroundLight from '@/assets/background.svg'
+import backgroundDark from '@/assets/background-dark.svg'
+
+import { ClientRouter } from 'astro:transitions'
+import SVGIcon from '@/components/icons/SVGIcon'
+import '@/styles/global.css'
+
+import { URL_BACKEND_UPLOADS } from 'astro:env/client'
+import { fetchEcommerceData } from '@/services/ecommerceService'
+import { Cog } from 'lucide-react'
+
+const title = Astro.props.title ? Astro.props.title.replace(/^\w+/, (match: string) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) : 'Astro'
+
+const currentUrl = Astro.url
+const isProductsPage = currentUrl.pathname.includes('products')
+
+const result = await fetchEcommerceData()
+const ecommerceData = result?.data
+
+const currentPage = Astro.url.pathname
+
+const user = await Astro.locals.currentUser()
+---
+
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width"
+        />
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            media="(prefers-color-scheme: dark)"
+            href={`${URL_BACKEND_UPLOADS}/ecommerce/${ecommerceData?.faviconLight}`}
+        />
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            media="(prefers-color-scheme: light)"
+            href={`${URL_BACKEND_UPLOADS}/ecommerce/${ecommerceData?.faviconDark}`}
+        />
+        <meta
+            name="generator"
+            content={Astro.generator}
+        />
+        <script
+            is:inline
+            src="https://unpkg.com/@rive-app/canvas"
+        ></script>
+        <ClientRouter />
+        <title>{title}</title>
+
+        <script>
+            const applyTheme = () => {
+                const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                document.documentElement.classList.toggle('dark', theme === 'dark')
+            }
+
+            applyTheme() // Aplica el tema en la carga inicial
+
+            document.addEventListener('astro:after-swap', applyTheme) // Re-aplica el tema al cambiar de página
+        </script>
+
+        <script is:inline>
+            const getThemePreference = () => {
+                if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+                    return localStorage.getItem('theme')
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+            }
+            const isDark = getThemePreference() === 'dark'
+            document.documentElement.classList[isDark ? 'add' : 'remove']('dark')
+
+            if (typeof localStorage !== 'undefined') {
+                const observer = new MutationObserver(() => {
+                    const isDark = document.documentElement.classList.contains('dark')
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light')
+                })
+                observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+            }
+        </script>
+    </head>
+    <body>
+        <img
+            id="background"
+            src={backgroundLight.src}
+            class="max-sm:!-top-[30%] [.dark_&]:hidden"
+            alt=""
+            fetchpriority="high"
+        />
+
+        <img
+            id="background"
+            src={backgroundDark.src}
+            class="max-sm:!-top-[30%] hidden [.dark_&]:block"
+            alt=""
+            fetchpriority="high"
+        />
+        <CustomNavigationMenu
+            pathName={currentPage}
+            client:load
+        />
+        <slot />
+
+        {
+            currentPage === '/' || currentPage === '/cart' ? (
+                <picture class="p-10">
+                    {ecommerceData?.paymentMethodsImageLight && ecommerceData?.paymentMethodsImageDark && (
+                        <>
+                            <img
+                                src={`${URL_BACKEND_UPLOADS}/ecommerce/${ecommerceData?.paymentMethodsImageLight}`}
+                                class={`h-20 w-10/12 lg:w-6/12 mx-auto object-contain block dark:hidden`}
+                                alt=""
+                            />
+                            <img
+                                src={`${URL_BACKEND_UPLOADS}/ecommerce/${ecommerceData?.paymentMethodsImageDark}`}
+                                class={`h-20 w-10/12 lg:w-6/12 mx-auto object-contain dark:block hidden`}
+                                alt=""
+                            />
+                        </>
+                    )}
+                </picture>
+            ) : null
+        }
+
+        <Footer
+            client:load
+            ecommerceData={ecommerceData}
+        />
+
+        {
+            user ? (
+                <a
+                    href="/backoffice"
+                    class="fixed inline-block bottom-4 right-4 z-[60] bg-black text-white dark:bg-white dark:text-black rounded-full p-2.5 shadow-md hover:opacity-80"
+                    transition:name="backoffice-text">
+                    <Cog size="30" />
+                </a>
+            ) : (
+                <a
+                    href={`https://wa.me/57${ecommerceData?.whatsapp}?text=Hola, ${isProductsPage ? 'estoy interesado/a en ' + currentUrl.href : 'quiero más información sobre sus productos 😊'}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="fixed inline-block bottom-4 right-4 z-[60] bg-black text-white dark:bg-white dark:text-black rounded-full p-2.5 shadow-md">
+                    <SVGIcon
+                        src={whatsapp.src}
+                        size={30}
+                        client:load
+                    />
+                </a>
+            )
+        }
+    </body>
+</html>

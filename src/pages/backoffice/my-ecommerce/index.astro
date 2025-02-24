@@ -1,0 +1,10 @@
+---
+import BackofficeLayout from '@/layouts/BackofficeLayout.astro'
+import EcommerceTable from './_ecommerce-table'
+---
+
+<BackofficeLayout title="Mi E-Commerce">
+    <div class="min-lg:flex flex-col items-center justify-center h-full max-lg:pt-20">
+        <EcommerceTable client:load />
+    </div>
+</BackofficeLayout>

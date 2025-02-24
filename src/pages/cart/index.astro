@@ -1,0 +1,19 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Cart from '@/components/Cart'
+---
+
+<Layout title="Mi carrito de compras">
+    <main>
+        <section class="min-h-[inherit] h-full">
+            <div class="2xl:w-9/12 mx-auto min-h-[inherit] h-full flex flex-col items-center justify-center">
+                <div class="w-11/12 lg:w-9/12 mx-auto mt-8">
+                    <Cart
+                        classNameIdentifier="cart-page"
+                        client:load
+                    />
+                </div>
+            </div>
+        </section>
+    </main>
+</Layout>

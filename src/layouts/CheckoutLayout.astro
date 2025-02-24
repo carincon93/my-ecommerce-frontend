@@ -1,0 +1,74 @@
+---
+import { ClientRouter } from 'astro:transitions'
+import '@/styles/global.css'
+
+import { URL_BACKEND_UPLOADS } from 'astro:env/client'
+import { fetchEcommerceData } from '@/services/ecommerceService'
+
+const title = Astro.props.title ? Astro.props.title.replace(/^\w+/, (match: string) => match.charAt(0).toUpperCase() + match.slice(1).toLowerCase()) : 'Astro'
+
+const result = await fetchEcommerceData()
+---
+
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width"
+        />
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            media="(prefers-color-scheme: dark)"
+            href={`${URL_BACKEND_UPLOADS}/ecommerce/${result?.data?.faviconLight}`}
+        />
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            media="(prefers-color-scheme: light)"
+            href={`${URL_BACKEND_UPLOADS}/ecommerce/${result?.data?.faviconDark}`}
+        />
+        <meta
+            name="generator"
+            content={Astro.generator}
+        />
+
+        <ClientRouter />
+        <title>{title}</title>
+
+        <script>
+            const applyTheme = () => {
+                const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                document.documentElement.classList.toggle('dark', theme === 'dark')
+            }
+
+            applyTheme() // Aplica el tema en la carga inicial
+
+            document.addEventListener('astro:after-swap', applyTheme) // Re-aplica el tema al cambiar de página
+        </script>
+
+        <script is:inline>
+            const getThemePreference = () => {
+                if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+                    return localStorage.getItem('theme')
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+            }
+            const isDark = getThemePreference() === 'dark'
+            document.documentElement.classList[isDark ? 'add' : 'remove']('dark')
+
+            if (typeof localStorage !== 'undefined') {
+                const observer = new MutationObserver(() => {
+                    const isDark = document.documentElement.classList.contains('dark')
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light')
+                })
+                observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+            }
+        </script>
+    </head>
+    <body>
+        <slot />
+    </body>
+</html>

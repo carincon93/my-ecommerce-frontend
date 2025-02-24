@@ -1,0 +1,190 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import ShoppingCartButtons from '@/components/ShoppingCartButtons'
+import ImageCarousel from '@/components/ImageCarousel'
+import ProductCarousel from '@/components/ProductCarousel'
+
+import facebook from '@/assets/icons/facebook.svg'
+import whatsapp from '@/assets/icons/whatsapp.svg'
+
+import { PRODUCTS_FOLDER, URL_BACKEND_UPLOADS } from 'astro:env/client'
+import type { ProductVariant } from '@/lib/types'
+
+import { fetchProductsData } from '@/services/productService'
+
+const { slug } = Astro.params
+
+const currentUrl = Astro.url
+
+// Obtener los datos dinámicamente en el servidor
+const products = await fetchProductsData()
+const product = products.find((product) => product.slug === slug)
+
+// Filtrar variantes si existen
+const productVariants = product?.variants?.filter((variant) => (Array.isArray(variant) ? variant.length > 0 : variant))
+
+import { fetchEcommerceData } from '@/services/ecommerceService'
+import { Badge } from '@/components/ui/badge'
+import SVGIcon from '@/components/icons/SVGIcon'
+const result = await fetchEcommerceData()
+---
+
+<Layout title={product?.name}>
+    <main
+        transition:name=`products-${slug}-box`
+        class="bg-white dark:bg-black">
+        <div class="flex flex-col lg:flex-row relative">
+            <div class="lg:hidden relative overflow-hidden h-[60dvh]">
+                {
+                    product?.photos && (
+                        <ImageCarousel
+                            images={product.photos}
+                            client:load
+                        />
+                    )
+                }
+            </div>
+
+            <div class="hidden lg:block lg:flex-[0_0_65%]">
+                {
+                    product?.photos && product?.photos.length > 0 && (
+                        <picture>
+                            <img
+                                src={`${URL_BACKEND_UPLOADS + PRODUCTS_FOLDER + product?.photos[0].image}`}
+                                alt=""
+                                class="aspect-square w-full object-cover animate-blur-fade-out"
+                                transition:name={`products-${slug}-image`}
+                            />
+                        </picture>
+                    )
+                }
+                <div class="grid grid-cols-2 gap-1 mt-1">
+                    {
+                        product?.photos?.map((photo) => (
+                            <picture>
+                                <img src={`${URL_BACKEND_UPLOADS + PRODUCTS_FOLDER + photo.image}`} />
+                            </picture>
+                        ))
+                    }
+                </div>
+            </div>
+            <!-- Aside -->
+            <div class="flex-[0_0_35%]">
+                <div class="sticky top-20 p-6 space-y-8">
+                    <div>
+                        <small
+                            class="tracking-wider text-gray-600 uppercase mb-2 block"
+                            transition:name=`products-${slug}-label`>
+                            {product?.label}
+                        </small>
+                        <h1
+                            class="uppercase text-2xl font-semibold"
+                            transition:name=`products-${slug}-title`>
+                            {product?.name}
+                        </h1>
+                        <span
+                            class="tracking-wider block text-xl my-2"
+                            transition:name=`products-${slug}-price`>
+                            {product?.priceBeforeOff && <del class="text-gray-500">${product?.priceBeforeOff.toLocaleString('es-CO')},00</del>}
+                            ${product?.price.toLocaleString('es-CO')},00
+                            {
+                                product?.priceBeforeOff && (
+                                    <Badge
+                                        className="!bg-sky-500"
+                                        style={{ viewTransitionName: 'oferta-box' }}>
+                                        Oferta
+                                    </Badge>
+                                )
+                            }
+                        </span>
+                        <small class="text-gray-500 block">Impuesto incluido. Los gastos de envío se calculan en la pantalla de pago.</small>
+                    </div>
+                    <div>
+                        <p class="text-sm whitespace-pre-line">
+                            {product?.description}
+                        </p>
+                    </div>
+                    <a
+                        href={`http://www.facebook.com/sharer.php?u=${currentUrl.href}`}
+                        class="bg-foreground dark:bg-foreground text-background not-visited:hover:opacity-70 p-1.5 rounded-md inline-block"
+                        target="_blank"
+                        aria-label="Facebook">
+                        <SVGIcon
+                            src={facebook.src}
+                            size={24}
+                            client:load
+                        />
+                    </a>
+
+                    <a
+                        href={`https://wa.me/57${result.data?.whatsapp}?text=Hola, estoy interesado/a en ${currentUrl.href}`}
+                        class="bg-foreground dark:bg-foreground text-background hover:opacity-70 p-2 rounded-md inline-block"
+                        target="_blank"
+                        aria-label="WhatsApp">
+                        <SVGIcon
+                            src={whatsapp.src}
+                            size={19}
+                            client:load
+                        />
+                    </a>
+                    <div>
+                        <p class="capitalize mb-2"><strong>Color:</strong> {product?.colorName}</p>
+
+                        <div class="flex gap-1">
+                            {
+                                product?.photos && product?.photos.length > 0 && (
+                                    <picture class="bg-gray-200 aspect-square block size-[100px] border-[1px] border-black">
+                                        <img
+                                            src={`${URL_BACKEND_UPLOADS + PRODUCTS_FOLDER + product?.photos[0].image}`}
+                                            class="object-cover w-full h-full"
+                                        />
+                                    </picture>
+                                )
+                            }
+                            {
+                                productVariants &&
+                                    productVariants.map(
+                                        (productVariant: ProductVariant) =>
+                                            productVariant?.mainProduct.photos &&
+                                            productVariant?.mainProduct.photos.length > 0 && (
+                                                <a
+                                                    href={`/products/${productVariant.mainProduct.slug}`}
+                                                    class="hover:opacity-50 transition-opacity ease-in-out duration-200"
+                                                    style={{ viewTransitionName: `products-${productVariant.mainProduct.slug}-box` }}>
+                                                    <picture class="bg-gray-200 aspect-square block size-[100px] border-[1px] border-gray-300">
+                                                        <img
+                                                            src={`${URL_BACKEND_UPLOADS + PRODUCTS_FOLDER + productVariant.mainProduct?.photos[0].image}`}
+                                                            class="object-cover w-full h-full"
+                                                            style={{ viewTransitionName: `products-${productVariant.mainProduct.slug}-image` }}
+                                                        />
+                                                    </picture>
+                                                </a>
+                                            ),
+                                    )
+                            }
+                        </div>
+                    </div>
+
+                    <div>
+                        {
+                            product && (
+                                <ShoppingCartButtons
+                                    product={product}
+                                    client:load
+                                />
+                            )
+                        }
+                    </div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+        <section class="p-10 mt-20 space-y-10 overflow-x-hidden">
+            <h1 class="text-center font-bold uppercase text-4xl mb-20">Productos que te pueden gustar</h1>
+            <ProductCarousel
+                category="nuevo"
+                client:load
+            />
+        </section>
+    </main>
+</Layout>
